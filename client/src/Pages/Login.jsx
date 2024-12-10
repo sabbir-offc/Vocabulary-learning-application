@@ -1,22 +1,31 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Updated to useNavigate
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom"; // Updated to useNavigate
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
+import { loginUser } from "../Services/authService";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
-  const navigate = useNavigate(); // useNavigate instead of useHistory
+  const navigate = useNavigate();
+  const loginInfo = {
+    email,
+    password,
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const toastId = toast.loading("Login...");
     try {
-      const response = await api.post("/api/auth/login", { email, password });
-      login({ token: response.data.token });
-      navigate("/"); // Redirect to home after successful login
+      const dbResponse = await loginUser(loginInfo);
+      console.log(dbResponse);
+      login({ token: dbResponse.token });
+      toast.success("Login successful", { id: toastId });
+      navigate("/");
     } catch (error) {
-      console.error("Login failed:", error);
+      console.log(error?.response?.data?.message);
+      toast.error(error.response.data.message, { id: toastId });
     }
   };
 
@@ -74,15 +83,15 @@ const Login = () => {
 
         <div className="flex items-center justify-center py-4 text-center bg-gray-50 ">
           <span className="text-sm text-gray-600 ">
-            Don't have an account?{" "}
+            {`Don't have an account? `}
           </span>
 
-          <a
-            href="#"
-            className="mx-2 text-sm font-bold text-blue-500  hover:underline"
+          <Link
+            to={"/register"}
+            className="text-sm text-blue-500 hover:underline "
           >
             Register
-          </a>
+          </Link>
         </div>
       </div>
     </div>
