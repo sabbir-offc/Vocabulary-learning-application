@@ -19,12 +19,16 @@ const Header = () => {
 
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { logout } = useAuth();
-  const { data: user, isLoading } = useUserData();
+  const { data: user, isLoading, refetch } = useUserData();
   if (isLoading) return <h1>Loading</h1>;
   if (isLoading) {
     return <p>Loading...</p>; // Show loading state
   }
   console.log(user);
+  const handleLogout = () => {
+    logout();
+    refetch();
+  };
   return (
     <nav className="flex items-center justify-between relative container mx-auto py-2">
       <img src="/logo.png" alt="logo" className="w-[55px] " />
@@ -35,8 +39,10 @@ const Header = () => {
         </li>
 
         <li className="flex items-center gap-[5px] cursor-pointer">
-          <AiOutlineFire className="text-[1.1rem] text-gray-600" />
-          Features
+          <Link to={"/lessons"}>
+            <AiOutlineFire className="text-[1.1rem] text-gray-600" />
+            Lessons
+          </Link>
         </li>
         <li className="flex items-center gap-[5px] cursor-pointer">
           <BiSupport className="text-[1.1rem] text-gray-600" />
@@ -85,7 +91,7 @@ const Header = () => {
 
               <div className="mt-3 border-t border-gray-200 pt-[5px]">
                 <button
-                  onClick={() => logout()}
+                  onClick={handleLogout}
                   className="flex items-center gap-[5px] rounded-md p-[8px] pr-[45px] py-[3px] text-[1rem] text-red-500 hover:bg-red-50"
                 >
                   <TbLogout2 />

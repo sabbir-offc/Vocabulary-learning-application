@@ -7,7 +7,7 @@ export const fetchUserData = async () => {
   }
 
   try {
-    const response = await api.get("api/auth/me", {
+    const response = await api.get("auth/me", {
       headers: {
         Authorization: `Bearer ${token}`, // Send token in Authorization header
       },
@@ -20,11 +20,11 @@ export const fetchUserData = async () => {
 };
 
 export const loginUser = async (loginInfo) => {
-  const { data } = await api.post("/api/auth/login", loginInfo);
+  const { data } = await api.post("auth/login", loginInfo);
   return data;
 };
 
 export const createUser = async (userData) => {
-  const { data } = await api.post("/api/auth/register", userData);
+  const { data } = await api.post("auth/register", userData);
   return data;
 };
