@@ -19,22 +19,28 @@ const createLesson = async (req, res) => {
   }
 };
 
-// View all lessons
+
 const getLessons = async (req, res) => {
   try {
-    const lessons = await Lesson.find().sort({ number: 1 });
-    const lessonsWithCount = lessons.map((lesson) => ({
+    const lessons = await Lesson.find().sort({ number: 1 }); // Fetch lessons
+
+    // Transform lessons to include vocabulary count
+    const formattedLessons = lessons.map((lesson) => ({
       id: lesson._id,
       name: lesson.name,
       number: lesson.number,
       vocabularyCount: lesson.vocabulary.length,
     }));
-    res.status(200).json(lessonsWithCount);
+
+    res.status(200).json(formattedLessons);
   } catch (error) {
-    console.error("Error fetching lessons:", error); // Log the error
+    console.error("Error fetching lessons:", error);
     res.status(500).json({ message: "Error fetching lessons", error });
   }
 };
+
+
+
 
 // Update a lesson
 const updateLesson = async (req, res) => {

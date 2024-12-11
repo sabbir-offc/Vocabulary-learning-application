@@ -10,8 +10,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-
 const authRoutes = require("./routes/auth");
 const lessonRoutes = require("./routes/lesson");
 const vocabRoutes = require("./routes/vocabulary");

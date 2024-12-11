@@ -1,23 +1,17 @@
 const express = require("express");
-const { verifyToken } = require("../middleware/authMiddleware");
 const router = express.Router();
+const { verifyToken } = require("../middleware/authMiddleware"); // Use middleware to verify admin login
 const {
-  addVocabulary,
+  createVocabulary,
+  getVocabularies,
   updateVocabulary,
   deleteVocabulary,
-  getVocabularies,
-} = require("../controllers/vocabController");
+} = require("../controllers/vocabularyController");
 
-// Route to get all vocabularies (protected)
-router.get("/", verifyToken, getVocabularies);
-
-// Route to add a vocabulary (protected, only for admin)
-router.post("/add", verifyToken, addVocabulary);
-
-// Route to update a vocabulary (protected, only for admin)
-router.put("/update/:id", verifyToken, updateVocabulary);
-
-// Route to delete a vocabulary (protected, only for admin)
-router.delete("/delete/:id", verifyToken, deleteVocabulary);
+// Routes for vocabulary management
+router.post("/", verifyToken, createVocabulary); // Admin can create a new vocabulary
+router.get("/", verifyToken, getVocabularies); // Admin can view all vocabularies
+router.put("/:id", verifyToken, updateVocabulary); // Admin can update a vocabulary
+router.delete("/:id", verifyToken, deleteVocabulary); // Admin can delete vocabulary
 
 module.exports = router;
