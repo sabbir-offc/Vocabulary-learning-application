@@ -1,28 +1,16 @@
-const { MongoClient } = require("mongodb");
-const dotenv = require("dotenv");
-dotenv.config();
+const mongoose = require("mongoose");
 
-const client = new MongoClient(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-let db;
-
-async function connectDB() {
+const connectDB = async () => {
   try {
-    await client.connect();
-    console.log("Connected to MongoDB");
-    db = client.db("japanese-learn"); // Replace 'japanese-learn' with your database name
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error("MongoDB connection failed:", error);
-    process.exit(1);
+    console.error(`Error: ${error.message}`);
+    process.exit(1); // Exit process with failure
   }
-}
+};
 
-function getDB() {
-  if (!db) throw new Error("Database not initialized");
-  return db;
-}
-
-module.exports = { connectDB, getDB };
+module.exports = { connectDB };

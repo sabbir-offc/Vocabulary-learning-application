@@ -1,24 +1,24 @@
 const express = require("express");
-const { verifyToken } = require("../middleware/authMiddleware");
-const { verifyAdmin } = require("../middleware/roleMiddleware");
-const router = express.Router();
 const {
-  addLesson,
+  createLesson,
+  getLessons,
   updateLesson,
   deleteLesson,
-  getLessons,
 } = require("../controllers/lessonController");
+const { verifyToken } = require("../middleware/authMiddleware");
 
-// Route to get all lessons (protected)
+const router = express.Router();
+
+// Create a Lesson
+router.post("/", verifyToken, createLesson);
+
+// View All Lessons
 router.get("/", verifyToken, getLessons);
 
-// Route to add a lesson (protected, only for admin)
-router.post("/add", verifyToken, verifyAdmin, addLesson);
+// Update/Edit a Lesson
+router.put("/:id", verifyToken, updateLesson);
 
-// Route to update a lesson (protected, only for admin)
-router.put("/update/:id", verifyToken, updateLesson);
-
-// Route to delete a lesson (protected, only for admin)
-router.delete("/delete/:id", verifyToken, deleteLesson);
+// Delete a Lesson
+router.delete("/:id", verifyToken, deleteLesson);
 
 module.exports = router;

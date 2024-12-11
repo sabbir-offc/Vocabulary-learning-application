@@ -1,65 +1,80 @@
-const { getDB } = require("../DB/db");
+const Lesson = require("../models/lessonModel");
 
-// Add a lesson
-async function addLesson(req, res) {
-  const { name, lessonNumber } = req.body;
-  try {
-    const db = getDB();
-    const result = await db
-      .collection("lessons")
-      .insertOne({ name, lessonNumber });
-    res
-      .status(201)
-      .json({
-        message: "Lesson added successfully",
-        lessonId: result.insertedId,
-      });
-  } catch (error) {
-    res.status(500).json({ message: "Error adding lesson", error });
+// Create a new lesson
+const createLesson = async (req, res) => {
+  const { name, number } = req.body;
+
+  if (!name || !number) {
+    return res
+      .status(400)
+      .json({ message: "Lesson name and number are required" });
   }
-}
+
+  try {
+    const lesson = new Lesson({ name, number, vocabulary: [] });
+    await lesson.save();
+    res.status(201).json(lesson);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating lesson", error });
+  }
+};
+
+// View all lessons
+const getLessons = async (req, res) => {
+  try {
+    const lessons = await Lesson.find().sort({ number: 1 });
+    const lessonsWithCount = lessons.map((lesson) => ({
+      id: lesson._id,
+      name: lesson.name,
+      number: lesson.number,
+      vocabularyCount: lesson.vocabulary.length,
+    }));
+    res.status(200).json(lessonsWithCount);
+  } catch (error) {
+    console.error("Error fetching lessons:", error); // Log the error
+    res.status(500).json({ message: "Error fetching lessons", error });
+  }
+};
 
 // Update a lesson
-async function updateLesson(req, res) {
+const updateLesson = async (req, res) => {
   const { id } = req.params;
-  const { name, lessonNumber } = req.body;
+  const { name, number } = req.body;
+
+  if (!name || !number) {
+    return res
+      .status(400)
+      .json({ message: "Lesson name and number are required" });
+  }
+
   try {
-    const db = getDB();
-    const result = await db
-      .collection("lessons")
-      .updateOne(
-        { _id: new require("mongodb").ObjectId(id) },
-        { $set: { name, lessonNumber } }
-      );
-    res.json({ message: "Lesson updated successfully" });
+    const updatedLesson = await Lesson.findByIdAndUpdate(
+      id,
+      { name, number },
+      { new: true }
+    );
+    if (!updatedLesson) {
+      return res.status(404).json({ message: "Lesson not found" });
+    }
+    res.status(200).json(updatedLesson);
   } catch (error) {
     res.status(500).json({ message: "Error updating lesson", error });
   }
-}
+};
 
 // Delete a lesson
-async function deleteLesson(req, res) {
+const deleteLesson = async (req, res) => {
   const { id } = req.params;
+
   try {
-    const db = getDB();
-    await db
-      .collection("lessons")
-      .deleteOne({ _id: new require("mongodb").ObjectId(id) });
-    res.json({ message: "Lesson deleted successfully" });
+    const deletedLesson = await Lesson.findByIdAndDelete(id);
+    if (!deletedLesson) {
+      return res.status(404).json({ message: "Lesson not found" });
+    }
+    res.status(200).json({ message: "Lesson deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting lesson", error });
   }
-}
+};
 
-// Get all lessons
-async function getLessons(req, res) {
-  try {
-    const db = getDB();
-    const lessons = await db.collection("lessons").find().toArray();
-    res.json(lessons);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching lessons", error });
-  }
-}
-
-module.exports = { addLesson, updateLesson, deleteLesson, getLessons };
+module.exports = { createLesson, getLessons, updateLesson, deleteLesson };
